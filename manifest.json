@@ -1,0 +1,59 @@
+{
+    "name": "AEP Requests Analyzer",
+    "description": "Extension to parse Adobe Experience Platform analytics requests",
+    "version": "0.1",
+    "manifest_version": 3,
+    "action": {
+        "default_title": "AEP debugger is ON",
+        "default_icon": {
+            "16": "img/icon.png",
+            "24": "img/icon.png",
+            "32": "img/icon.png",
+            "48": "img/icon.png",
+            "128": "img/icon.png"
+        }
+    },
+    "icons": {
+        "16": "img/icon.png",
+        "24": "img/icon.png",
+        "32": "img/icon.png",
+        "48": "img/icon.png",
+        "128": "img/icon.png"
+    },
+    "background": {
+        "service_worker": "js/background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://www.sisal.it/*"
+            ],
+            "js": [
+                "js/content-script.js",
+                "js/request-analyzer.js"
+            ],
+            "run_at": "document_start"
+        }
+    ],
+    "permissions": [
+        "storage",
+        "activeTab",
+        "scripting",
+        "tabs",
+        "webRequest",
+        "webNavigation"
+    ],
+    "host_permissions": [
+        "*://*/*"
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "js/request-analyzer.js"
+            ],
+            "matches": [
+                "https://www.sisal.it/*"
+            ]
+        }
+    ]
+}
