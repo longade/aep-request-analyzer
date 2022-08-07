@@ -4,7 +4,7 @@
     "version": "0.1",
     "manifest_version": 3,
     "action": {
-        "default_title": "AEP debugger is ON",
+        "default_title": "AEP analyzer is ON",
         "default_icon": {
             "16": "img/icon.png",
             "24": "img/icon.png",
@@ -26,7 +26,8 @@
     "content_scripts": [
         {
             "matches": [
-                "https://www.sisal.it/*"
+                "http://*.sisal.it/*",
+                "https://*.sisal.it/*"
             ],
             "js": [
                 "js/content-script.js",
@@ -52,7 +53,8 @@
                 "js/request-analyzer.js"
             ],
             "matches": [
-                "https://www.sisal.it/*"
+                "http://*.sisal.it/*",
+                "https://*.sisal.it/*"
             ]
         }
     ]

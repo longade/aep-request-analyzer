@@ -1,12 +1,16 @@
-const getCallType = (analytics) => {
-    let callType = '';
-    const webInteraction = analytics.session?.web?.webInteraction;
-    if (webInteraction?.linkClicks?.value > 0) {
-        callType = 'Custom Link';
+const getEventType = (eventType) => {
+
+    const type = {
+        pageView: 'web.webpagedetails.pageViews',
+        customLink: 'web.webinteraction.linkClicks'
     }
-    const webPageDetails = analytics.session?.web?.webPageDetails;
-    if (webPageDetails?.pageViews?.value > 0) {
+
+    let callType;
+    if (eventType === type.pageView) {
         callType = 'Page View';
+    }
+    else if (eventType === type.customLink) {
+        callType = 'Custom Link';
     }
     return callType || 'Unknown';
 }
@@ -64,7 +68,8 @@ const printEvents = (events) => {
 }
 
 const printAll = (callType, dimensions, events) => {
-    console.group('[AEP] Adobe Analytics call: ' + callType);
+    const color = callType === 'Page View' ? 'color: lightgreen; background: black' : 'color: yellow; background: black;'
+    console.group('[AEP] Adobe Analytics call: %c' + callType, color);
     printDimensions(dimensions)
     printEvents(events)
     console.groupEnd();
@@ -72,11 +77,16 @@ const printAll = (callType, dimensions, events) => {
 
 const analyzeRequest = (request) => {
     const requestBody = JSON.parse(request.postQuery);
-    const analytics = requestBody?.events?.[0]?.xdm?._experience?.analytics;
+    const xdm = requestBody?.events?.[0]?.xdm;
+    const eventType = xdm?.eventType;
+    const analytics = xdm?._experience?.analytics;
     if (analytics) {
         // console.log(analytics);
 
-        const callType = getCallType(analytics);
+        let callType;
+        if (eventType) {
+            callType = getEventType(eventType);
+        }
 
         const dimensions = {
             eVars: getEVars(analytics),
