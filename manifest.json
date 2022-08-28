@@ -11,7 +11,8 @@
             "32": "img/icon.png",
             "48": "img/icon.png",
             "128": "img/icon.png"
-        }
+        },
+        "default_popup": "html/popup.html"
     },
     "icons": {
         "16": "img/icon.png",
@@ -26,8 +27,8 @@
     "content_scripts": [
         {
             "matches": [
-                "http://*.sisal.it/*",
-                "https://*.sisal.it/*"
+                "*://*/*",
+                "*://*/*"
             ],
             "js": [
                 "js/content-script.js",
@@ -53,8 +54,8 @@
                 "js/request-analyzer.js"
             ],
             "matches": [
-                "http://*.sisal.it/*",
-                "https://*.sisal.it/*"
+                "*://*/*",
+                "*://*/*"
             ]
         }
     ]

@@ -25,9 +25,8 @@ const getHierarchies = (analytics) => {
 
 const getLists = (analytics) => {
     return Object.entries(analytics.customDimensions.lists)
-        .map(([key, value]) => value.list)
-        .filter(list => list.length > 0)
-        .map(list => list.map(el => el.value));
+        .filter(([key, value]) => value.list.length > 0)
+        .map(([key, value]) => ({ name: key, values: value.list.map(el => el.value) }));
 }
 
 const getProps = (analytics) => {
@@ -49,16 +48,50 @@ const printDimensions = (dimensions) => {
     console.table(dimensions.hierarchies);
     console.groupEnd();
 
-    dimensions.lists.forEach((list, index) => {
-        console.groupCollapsed('List ' + index);
-        console.table(list);
+    if (dimensions.lists.length > 0) {
+        console.groupCollapsed('Lists');
+        dimensions.lists.forEach((list, index) => {
+            console.groupCollapsed(list.name);
+            console.table(list.values);
+            console.groupEnd();
+        });
         console.groupEnd();
-    });
+    }
 }
 
 const getEvents = (analytics) => {
-    const events = {...analytics.event1to100, ...analytics.event101to200};
+    const allEvents = Object.fromEntries(Object.entries(analytics).filter(([key, value]) => key.startsWith('event')));
+    // const events = { ...analytics.event1to100, ...analytics.event101to200 };
+    let events = {};
+    for (const event in allEvents) {
+        events = { ...events, ...allEvents[event] };
+    }
     return Object.fromEntries(Object.entries(events).filter(([key, value]) => value.value === 1));
+}
+
+const getProducts = (products) => {
+    const finalProducts = [];
+    products.forEach(product => {
+        const finalProduct = {
+            SKU: product.SKU,
+            currencyCode: product.currencyCode,
+            name: product.name,
+            priceTotal: product.priceTotal,
+            quantity: product.quantity
+        }
+        finalProducts.push(finalProduct);
+    })
+    return finalProducts;
+}
+
+const printProducts = (products) => {
+    console.groupCollapsed('Products');
+    products.forEach((product, index) => {
+        console.groupCollapsed('Product ' + index);
+        console.table(product);
+        console.groupEnd();
+    })
+    console.groupEnd();
 }
 
 const printEvents = (events) => {
@@ -67,11 +100,12 @@ const printEvents = (events) => {
     console.groupEnd();
 }
 
-const printAll = (callType, dimensions, events) => {
+const printAll = (callType, dimensions, events, products) => {
     const color = callType === 'Page View' ? 'color: lightgreen; background: black' : 'color: yellow; background: black;'
     console.group('[AEP] Adobe Analytics call: %c' + callType, color);
     printDimensions(dimensions)
     printEvents(events)
+    printProducts(products);
     console.groupEnd();
 }
 
@@ -80,6 +114,7 @@ const analyzeRequest = (request) => {
     const xdm = requestBody?.events?.[0]?.xdm;
     const eventType = xdm?.eventType;
     const analytics = xdm?._experience?.analytics;
+    const productsListItems = xdm.productListItems;
     if (analytics) {
         // console.log(analytics);
 
@@ -94,9 +129,11 @@ const analyzeRequest = (request) => {
             lists: getLists(analytics),
             props: getProps(analytics)
         }
-        
+
         const events = getEvents(analytics);
-        
-        printAll(callType, dimensions, events);
+
+        const products = getProducts(productsListItems);
+
+        printAll(callType, dimensions, events, products);
     }
 }
