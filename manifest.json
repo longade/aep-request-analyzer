@@ -6,20 +6,20 @@
     "action": {
         "default_title": "AEP analyzer is ON",
         "default_icon": {
-            "16": "img/icon.png",
-            "24": "img/icon.png",
-            "32": "img/icon.png",
-            "48": "img/icon.png",
-            "128": "img/icon.png"
+            "16": "img/icon-on.png",
+            "24": "img/icon-on.png",
+            "32": "img/icon-on.png",
+            "48": "img/icon-on.png",
+            "128": "img/icon-on.png"
         },
         "default_popup": "html/popup.html"
     },
     "icons": {
-        "16": "img/icon.png",
-        "24": "img/icon.png",
-        "32": "img/icon.png",
-        "48": "img/icon.png",
-        "128": "img/icon.png"
+        "16": "img/icon-on.png",
+        "24": "img/icon-on.png",
+        "32": "img/icon-on.png",
+        "48": "img/icon-on.png",
+        "128": "img/icon-on.png"
     },
     "background": {
         "service_worker": "js/background.js"
@@ -43,7 +43,8 @@
         "scripting",
         "tabs",
         "webRequest",
-        "webNavigation"
+        "webNavigation",
+        "management"
     ],
     "host_permissions": [
         "*://*/*"

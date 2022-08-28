@@ -1,3 +1,4 @@
+/* Begin of workaround to fix service-worker becoming inactive */
 let lifeline;
 
 chrome.runtime.onConnect.addListener(port => {
@@ -8,7 +9,6 @@ chrome.runtime.onConnect.addListener(port => {
     }
 });
 
-/* Begin of workaround to fix service-worker becoming inactive */
 const keepAliveForced = () => {
     lifeline?.disconnect();
     lifeline = null;
@@ -45,7 +45,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     });
 
     chrome.action.setIcon({
-        path: changes.enabled?.newValue ? '../img/icon.png' : '../img/icon-off.png'
+        path: changes.enabled?.newValue ? '../img/icon-on.png' : '../img/icon-off.png'
     });
 });
 
@@ -72,3 +72,15 @@ chrome.webRequest.onBeforeRequest.addListener(
     console.log('Request: ', request);
     return true;
 }); */
+
+chrome.runtime.onInstalled.addListener(() => {
+    chrome.storage.local.set({ enabled: true });
+});
+
+chrome.management.onEnabled.addListener(() => {
+    chrome.storage.local.set({ enabled: true });
+});
+
+chrome.management.onDisabled.addListener(() => {
+    chrome.storage.local.clear();
+});

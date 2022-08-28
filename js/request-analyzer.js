@@ -85,13 +85,15 @@ const getProducts = (products) => {
 }
 
 const printProducts = (products) => {
-    console.groupCollapsed('Products');
-    products.forEach((product, index) => {
-        console.groupCollapsed('Product ' + index);
-        console.table(product);
+    if (products.length > 0) {
+        console.groupCollapsed('Products');
+        products.forEach((product, index) => {
+            console.groupCollapsed('Product ' + index);
+            console.table(product);
+            console.groupEnd();
+        })
         console.groupEnd();
-    })
-    console.groupEnd();
+    }
 }
 
 const printEvents = (events) => {
@@ -114,7 +116,7 @@ const analyzeRequest = (request) => {
     const xdm = requestBody?.events?.[0]?.xdm;
     const eventType = xdm?.eventType;
     const analytics = xdm?._experience?.analytics;
-    const productsListItems = xdm.productListItems;
+    const productsListItems = xdm.productListItems || [];
     if (analytics) {
         // console.log(analytics);
 
