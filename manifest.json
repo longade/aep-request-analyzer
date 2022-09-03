@@ -1,7 +1,7 @@
 {
     "name": "AEP Requests Analyzer",
     "description": "Extension to parse Adobe Experience Platform analytics requests",
-    "version": "0.1",
+    "version": "0.2",
     "manifest_version": 3,
     "action": {
         "default_title": "AEP analyzer is ON",

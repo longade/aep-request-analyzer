@@ -20,7 +20,13 @@ const getEVars = (analytics) => {
 }
 
 const getHierarchies = (analytics) => {
-    return { ...analytics.customDimensions.hierarchies.hier1, values: [...analytics.customDimensions.hierarchies.hier1.values].join(';') };
+    const hierarchies = analytics.customDimensions.hierarchies;
+    let finalHierarchies = {};
+    for (const [k, v] of Object.entries(hierarchies)) {
+        const newHier = { [k]: { ...v, values: [...v.values].join(';') } }
+        finalHierarchies = { ...finalHierarchies, ...newHier }
+    }
+    return finalHierarchies;
 }
 
 const getLists = (analytics) => {
@@ -33,8 +39,16 @@ const getProps = (analytics) => {
     return Object.fromEntries(Object.entries(analytics.customDimensions.props).filter(([key, value]) => value));
 }
 
+const getSession = (analytics) => {
+    const webPageDetails = analytics.session.web.webPageDetails;
+    const webInteraction = analytics.session.web.webInteraction;
+    return {
+        webInteraction: {...webInteraction},
+        webPageDetails: {...webPageDetails}
+    }
+}
+
 const printDimensions = (dimensions) => {
-    // console.log('Dimensions: ', dimensions);
 
     console.groupCollapsed('props');
     console.table(dimensions.props);
@@ -45,7 +59,11 @@ const printDimensions = (dimensions) => {
     console.groupEnd();
 
     console.groupCollapsed('Hierarchies');
-    console.table(dimensions.hierarchies);
+    Object.entries(dimensions.hierarchies).forEach(([key, value]) => {
+        console.groupCollapsed(key);
+        console.table(value);
+        console.groupEnd();
+    });
     console.groupEnd();
 
     if (dimensions.lists.length > 0) {
@@ -57,11 +75,19 @@ const printDimensions = (dimensions) => {
         });
         console.groupEnd();
     }
+
+    console.groupCollapsed('Session');
+    console.groupCollapsed('WebPageDetails');
+    console.table(dimensions.session.webPageDetails);
+    console.groupEnd();
+    console.groupCollapsed('WebInteraction');
+    console.table(dimensions.session.webInteraction);
+    console.groupEnd();
+    console.groupEnd();
 }
 
 const getEvents = (analytics) => {
     const allEvents = Object.fromEntries(Object.entries(analytics).filter(([key, value]) => key.startsWith('event')));
-    // const events = { ...analytics.event1to100, ...analytics.event101to200 };
     let events = {};
     for (const event in allEvents) {
         events = { ...events, ...allEvents[event] };
@@ -116,9 +142,11 @@ const analyzeRequest = (request) => {
     const xdm = requestBody?.events?.[0]?.xdm;
     const eventType = xdm?.eventType;
     const analytics = xdm?._experience?.analytics;
+    if (!analytics) {
+        return;
+    }
     const productsListItems = xdm.productListItems || [];
     if (analytics) {
-        // console.log(analytics);
 
         let callType;
         if (eventType) {
@@ -129,7 +157,8 @@ const analyzeRequest = (request) => {
             eVars: getEVars(analytics),
             hierarchies: getHierarchies(analytics),
             lists: getLists(analytics),
-            props: getProps(analytics)
+            props: getProps(analytics),
+            session: getSession(analytics)
         }
 
         const events = getEvents(analytics);
