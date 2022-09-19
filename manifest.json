@@ -39,11 +39,9 @@
     ],
     "permissions": [
         "storage",
-        "activeTab",
         "scripting",
         "tabs",
         "webRequest",
-        "webNavigation",
         "management"
     ],
     "host_permissions": [
